@@ -1,17 +1,28 @@
 #!/usr/bin/env python
+import sys
+import os
 import rclpy
 from rclpy.node import Node
 from std_srvs.srv import Empty
 from std_msgs.msg import Bool
-# from std_msgs.msg import String
 
 from led_control.samplebase import SampleBase
 
-class Circle(SampleBase):
+sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../../..'))
+from rgbmatrix import RGBMatrix, RGBMatrixOptions
+
+class Circle():
     def __init__(self, *args, **kwargs):
         super(Circle, self).__init__(*args, **kwargs)
 
-    def create_frame_canvas(self):
+    def create_frame_canvas_from_options(self):
+        options = RGBMatrixOptions()
+        options.rows = 64
+        options.cols = 64
+        options.hardware_mapping = 'adafruit-hat'
+        options.gpio_slowdown = 4
+
+        self.matrix = RGBMatrix(options = options)
         self.canvas = self.matrix.CreateFrameCanvas()
     
     def display(self, x, y, r):
@@ -43,8 +54,7 @@ class LedControl(Node):
         
         # create a circle object
         self.circle = Circle()
-        self.circle.process()
-        self.circle.create_frame_canvas()
+        self.circle.create_frame_canvas_from_options()
 
         # set the circle properties
         self.x = 32
@@ -59,7 +69,7 @@ class LedControl(Node):
     def timer_callback(self):
         # display the circle if flag is True
         # self.get_logger().info(f"Running")
-        self.get_logger().info(f"{self.flag=}")
+        # self.get_logger().info(f"{self.flag=}")
         if self.flag:
             self.circle.display(x=self.x, y=self.y, r=self.r)
         else:

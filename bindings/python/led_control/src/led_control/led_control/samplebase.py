@@ -68,7 +68,7 @@ class SampleBase(object):
         if not self.args.drop_privileges:
           options.drop_privileges=False
 
-        self.matrix = RGBMatrix(options = options)
+        # self.matrix = RGBMatrix(options = options)
 
         # try:
         #     # Start loop
