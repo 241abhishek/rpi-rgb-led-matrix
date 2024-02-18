@@ -8,10 +8,11 @@ from std_msgs.msg import Bool
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../../..'))
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
+from PIL import Image
 
-class Circle():
+class ImageViewer():
     def __init__(self, *args, **kwargs):
-        super(Circle, self).__init__(*args, **kwargs)
+        super(ImageViewer, self).__init__(*args, **kwargs)
 
     def create_frame_canvas_from_options(self):
         options = RGBMatrixOptions()
@@ -19,20 +20,25 @@ class Circle():
         options.cols = 64
         options.hardware_mapping = 'adafruit-hat'
         options.gpio_slowdown = 4
+        options.drop_privileges=False
 
         self.matrix = RGBMatrix(options = options)
         self.canvas = self.matrix.CreateFrameCanvas()
-    
-    def display(self, x, y, r):
+
+    def display_image(self):
         # clear the canvas for the next frame
         self.canvas.Clear()
-        # draw a circle with the center at (x, y) and radius r
-        for i in range(x - r, x + r):
-            for j in range(y - r, y + r):
-                if (i - x)**2 + (j - y)**2 <= r**2:
-                    self.canvas.SetPixel(i, j, 255, 0, 0)
+
+        # # open the image
+        image = Image.open('/home/msr/images/Northwestern-Wildcats-Logo.jpg')
+
+        # Make image fit our screen.
+        image.thumbnail((self.matrix.width, self.matrix.height), Image.ANTIALIAS)
+
+        self.matrix.SetImage(image.convert('RGB'))
+
         # swap the canvas to the display the frame
-        self.canvas = self.matrix.SwapOnVSync(self.canvas)
+        # self.canvas = self.matrix.SwapOnVSync(self.canvas)
 
     def clear(self):
         # clear the canvas for the next frame
@@ -44,34 +50,30 @@ class LedControl(Node):
         super().__init__('led_control')
         
         # declare a timer frequency parameter
-        self.declare_parameter('timer_frequency', 100.0)
+        self.declare_parameter('timer_frequency', 1000.0)
         self.timer_frequency = self.get_parameter('timer_frequency').get_parameter_value().double_value
 
         # create a timer with a rate
         self.create_timer(1/self.timer_frequency, self.timer_callback)
-        
-        # create a circle object
-        self.circle = Circle()
-        self.circle.create_frame_canvas_from_options()
 
-        # set the circle properties
-        self.x = 32
-        self.y = 32
-        self.r = 20
+        # create an image viewer object
+        self.image_viewer = ImageViewer()
+        self.image_viewer.create_frame_canvas_from_options()
+
+        # set the image viewer properties
         self.flag = False
 
         # create a subscriber to the light_status topic
         self.light_status_sub = self.create_subscription(Bool, 'light_status', self.light_status_callback, 10)
 
-        
     def timer_callback(self):
-        # display the circle if flag is True
+        # display the image if flag is True
         # self.get_logger().info(f"Running")
         # self.get_logger().info(f"{self.flag=}")
         if self.flag:
-            self.circle.display(x=self.x, y=self.y, r=self.r)
+            self.image_viewer.display_image()
         else:
-            self.circle.clear()
+            self.image_viewer.clear()
 
     def light_status_callback(self, msg):
         if msg.data:

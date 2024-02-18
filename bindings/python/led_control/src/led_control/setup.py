@@ -21,7 +21,8 @@ setup(
     entry_points={
         'console_scripts': [
             'led_control = led_control.test:main',
-            'circle_display = led_control.circle_display:main'
+            'circle_display = led_control.circle_display:main',
+            'image_viewer = led_control.image_viewer:main',
         ],
     },
 )
