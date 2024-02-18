@@ -30,7 +30,7 @@ class Circle():
         for i in range(x - r, x + r):
             for j in range(y - r, y + r):
                 if (i - x)**2 + (j - y)**2 <= r**2:
-                    self.canvas.SetPixel(i, j, 255, 0, 0)
+                    self.canvas.SetPixel(i, j, 16, 32, 240)
         # swap the canvas to the display the frame
         self.canvas = self.matrix.SwapOnVSync(self.canvas)
 
@@ -57,8 +57,9 @@ class LedControl(Node):
         # set the circle properties
         self.x = 32
         self.y = 32
-        self.r = 20
+        self.r = 10
         self.flag = False
+        self.status = False
 
         # create a subscriber to the light_status topic
         self.light_status_sub = self.create_subscription(Bool, 'light_status', self.light_status_callback, 10)
@@ -68,20 +69,23 @@ class LedControl(Node):
         # display the circle if flag is True
         # self.get_logger().info(f"Running")
         # self.get_logger().info(f"{self.flag=}")
-        if self.flag:
-            self.circle.display(x=self.x, y=self.y, r=self.r)
-        else:
-            self.circle.clear()
+        # if self.flag:
+        #     self.circle.display(x=self.x, y=self.y, r=self.r)
+        # else:
+        #     self.circle.clear()
+        pass
 
     def light_status_callback(self, msg):
         if msg.data:
             # log the msg data
             # self.get_logger().info(f"{msg.data=}")
-            self.flag = True
+            # self.flag = 
+            self.circle.display(x=self.x, y=self.y, r=self.r)
         else:
             # log the msg data
             # self.get_logger().info(f"{msg.data=}")
-            self.flag = False
+            # self.flag = False
+            self.circle.clear()
     
 
 def main(args=None):
