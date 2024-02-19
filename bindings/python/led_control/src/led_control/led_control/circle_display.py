@@ -99,6 +99,8 @@ class LedControl(Node):
         self.g = msg.y
         self.b = msg.z
         self.get_logger().info(f"Color changed to ({self.r}, {self.g}, {self.b})")
+        self.circle.clear()
+        self.circle.display(x=self.x, y=self.y, radius=self.radius, r=self.r, g=self.g, b=self.b)
 
 def main(args=None):
     rclpy.init(args=args)
