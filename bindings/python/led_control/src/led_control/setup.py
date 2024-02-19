@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'led_control = led_control.test:main'
+            'led_control = led_control.test:main',
+            'circle_display = led_control.circle_display:main'
         ],
     },
 )
